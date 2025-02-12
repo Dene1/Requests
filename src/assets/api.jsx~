@@ -1,5 +1,6 @@
-import {get, orderByChild, query, ref, push, set, remove} from "firebase/database"
+import {get, orderByChild, query, ref} from "firebase/database"
 import {db} from "../firebase.jsx";
+import {removeCase} from "../utils/removeCase.jsx";
 
 export const createCase = (newCase) => push(ref(db, "posts"), newCase).then(({key}) => key)
 

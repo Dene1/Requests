@@ -38,17 +38,17 @@ export default function App() {
         const {title, completed} = findCase(cases, caseId) || {}
 
         if (caseId === NEW_CASE_ID) {
-            createCase({title, completed}).then((casee) => {
+            createCase({title, completed}).then((id) => {
                 let updatedCases = setCaseInCases(cases, {
                     id: NEW_CASE_ID,
                     isEditing: false
                 })
                 updatedCases = removeCase(updatedCases, NEW_CASE_ID)
-                updatedCases = addCaseInCases(updatedCases, casee)
+                updatedCases = addCaseInCases(updatedCases, {id, title, completed})
                 setCases(updatedCases)
             })
         } else {
-            updateCase({id: caseId, title}).then(() => {
+            updateCase({id: caseId, title, completed}).then(() => {
                 setCases(setCaseInCases(cases, {id: caseId, isEditing: false}))
             })
         }
@@ -63,7 +63,8 @@ export default function App() {
     }
 
     const onCaseCompletedChange = (id, newCompleted) => {
-        updateCase({id, completed: newCompleted}).then(() => {
+        const {title} = findCase(cases, id) || {}
+        updateCase({id, title, completed: newCompleted}).then(() => {
             setCases(setCaseInCases(cases, {id, completed: newCompleted}))
         })
     }
