@@ -1,48 +1,102 @@
 import "./App.css"
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
+import {ControlPanel} from "./Control Panel/ControlPanel.jsx";
+import {Case} from "./components/Case/Case.jsx";
+import {createCase, deleteCase, readCase, updateCase} from "./assets/api.jsx";
+import {setCaseInCases} from "./utils/setCaseInCases.jsx";
+import {removeCase} from "./utils/removeCase.jsx";
+import {findCase} from "./utils/find-case.jsx";
+import {addCaseInCases} from "./utils/addCaseInCases.jsx";
+import {NEW_CASE_ID} from "./constants/newCaseId.jsx";
 
 export default function App() {
 
-    const [posts, setPosts] = useState([])
+    const [cases, setCases] = useState([])
+    const [searchPhrase, setSearchPhrase] = useState("")
+    const [isAlphabetSorting, setIsAlphabetSorting] = useState(false)
+
     const [isLoading, setIsLoading] = useState(false)
-    const [error, setError] = useState(null)
+    const [refreshCaseFlag, setRefreshCaseFlag] = useState(false)
+
+    const refreshCase = useCallback(() => {
+        setRefreshCaseFlag(!refreshCaseFlag)
+    }, [refreshCaseFlag, setRefreshCaseFlag])
 
     useEffect(() => {
-        setIsLoading(true)
-
-        fetch("https://jsonplaceholder.typicode.com/todos")
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json()
-            })
-            .then(todo => {
-                setPosts(todo)
-            })
+        readCase(searchPhrase, isAlphabetSorting)
+            .then((loadedCases) => setCases(loadedCases))
             .catch(error => {
-                setError(error.message)
+                console.log(error)
             })
             .finally(() => setIsLoading(false))
-    }, [])
+
+    }, [refreshCase, searchPhrase, isAlphabetSorting])
+
+    const onCaseAdd = () => setCases(addCaseInCases(cases))
+
+    const onCaseSave = (caseId) => {
+        const {title, completed} = findCase(cases, caseId) || {}
+
+        if (caseId === NEW_CASE_ID) {
+            createCase({title, completed}).then((casee) => {
+                let updatedCases = setCaseInCases(cases, {
+                    id: NEW_CASE_ID,
+                    isEditing: false
+                })
+                updatedCases = removeCase(updatedCases, NEW_CASE_ID)
+                updatedCases = addCaseInCases(updatedCases, casee)
+                setCases(updatedCases)
+            })
+        } else {
+            updateCase({id: caseId, title}).then(() => {
+                setCases(setCaseInCases(cases, {id: caseId, isEditing: false}))
+            })
+        }
+    }
+
+    const onCaseEdit = (id) => {
+        setCases(setCaseInCases(cases, {id, isEditing: true}))
+    }
+
+    const onCaseChange = (id, newTitle) => {
+        setCases(setCaseInCases(cases, {id, title: newTitle}))
+    }
+
+    const onCaseCompletedChange = (id, newCompleted) => {
+        updateCase({id, completed: newCompleted}).then(() => {
+            setCases(setCaseInCases(cases, {id, completed: newCompleted}))
+        })
+    }
+
+    const onCaseRemove = (id) => {
+        deleteCase(id).then(() => setCases(removeCase(cases, id)))
+    }
 
     return (
         <div className="App">
             <h1>Список Задач</h1>
-            {isLoading ? (
-                <p>Ошибка: {error}</p> // Отображение сообщения об ошибке
-            ) : (
-                <div>
-                    {posts.map((post) => (
-                        <div key={post.id}>
-                            <input type="checkbox" id={`todo-${post.id}`}
-                                   checked={post.completed} readOnly name="text"/>
-                            <label className="text"
-                                   htmlFor={`todo-${post.id}`}>{post.title}</label>
-                        </div>
-                    ))}
-                < /div>
-            )}
+            <ControlPanel
+                onCaseAdd={onCaseAdd}
+                onSearch={setSearchPhrase}
+                onSorting={setIsAlphabetSorting}
+            />
+            {isLoading ? (<div> Загрузка... </div>) : (
+                <div className="cases_one">
+                    {cases.map(({id, title, completed, isEditing = false}) => (
+                        <Case
+                            key={id}
+                            id={id}
+                            title={title}
+                            completed={completed}
+                            isEditing={isEditing}
+                            onChange={(newTitle) => onCaseChange(id, newTitle)}
+                            onCompletedChange={(newCompleted) =>
+                                onCaseCompletedChange(id, newCompleted)}
+                            onEdit={() => onCaseEdit(id)}
+                            onSave={() => onCaseSave(id)}
+                            onRemove={() => onCaseRemove(id)}/>)
+                    )}
+                < /div>)}
         < /div>
     )
 }

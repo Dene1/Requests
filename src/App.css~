@@ -15,10 +15,75 @@
 
 .App {
     text-align: center;
+
+}
+
+.cases_one {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.panel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.checkbox {
+    display: block;
+    text-align: center;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+}
+
+.search {
+    width: 450px;
+    height: 25px;
+    text-align: center;
 }
 
 .text {
     margin-left: 0.5rem;
+    border-bottom: 2px solid #444;
+}
+
+.checkbox1 {
+    display: none;
+}
+
+.label {
+    position: absolute;
+    display: flex;
+    justify-content: center;npm install firebasenpm install firebase
+    align-items: center;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+}
+
+.checkbox1:checked ~ .label {
+    box-shadow: inset 2px 2px 0;
+}
+
+.cases {
+    margin-top: 20px;
+    font-size: 17px;
+    padding-bottom: 2px;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: space-between;
+    width: 620px;
+}
+
+.button {
+    padding: 6px 12px;
+    margin-left: 10px;
+    text-align: center;
 }
 
 

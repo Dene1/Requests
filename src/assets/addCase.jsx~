@@ -1,0 +1,19 @@
+const fetchServer = (url, method = 'GET', {id, ...payload}) => {
+    let fetchUrl = url
+
+    if (id !== undefined) {
+        fetchUrl += `/${id}`
+    }
+
+    return fetch(fetchUrl, {
+        method,
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+    })
+}
+
+export const addCase = () => fetchServer()
+
+
