@@ -1,21 +1,32 @@
-import {Button} from "../components/button/button.jsx"
-import {Search} from "./components/search.jsx"
-import {Sorting} from "./components/sorting.jsx"
+import {Search} from "./components/search.jsx";
+import {Button} from "../components/button/button.jsx";
+import {Sorting} from "./components/sorting.jsx";
 
-export const ControlPanel = ({onCaseAdd, onSearch, onSorting}) => {
-    console.log("onSorting в ControlPanel:", typeof onSorting);
+export const ControlPanel = ({
+                                 onCaseAdd,
+                                 onSearch,
+                                 onSorting,
+                             }) => {
     return (
         <div className="panel">
             <Search onSearch={onSearch}/>
-            <Sorting onSorting={onSorting}/>
 
-            <Button className="button"
+            <Button className="buttons"
                     onClick={onCaseAdd}
                     type="button"
             >
-                ➕
+                Add Case ➕
             </Button>
+            {isEditing ? (
+                <input
+                    className="caseinput"
+                    type="text"
+                    value={title}
+                    onChange={({target}) => onChange(target.value)}
+                />
+                ): (<div>{title}</div>)}
+
+            <Sorting onSorting={onSorting}/>
         </div>
     )
 }
-

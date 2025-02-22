@@ -1,0 +1,64 @@
+import {TasksPage} from "../components/Tasks Page/TasksPage.jsx";
+import {Search} from "./components/search.jsx";
+import {Button} from "../components/button/button.jsx";
+import {Sorting} from "./components/sorting.jsx";
+
+export const MainPage = ({
+                             cases,
+                             onCaseChange,
+                             onCaseCompletedChange,
+                             onCaseEdit,
+                             onCaseSave,
+                             onCaseCancel,
+                             onCaseRemove,
+                             onCaseAdd,
+                             onSearch,
+                             onSorting,
+                         }) => {
+
+
+
+    const renderContent = () => {
+        if (cases.length === 0) {
+            return <div className="loader">Сегодня задач нет</div>
+        }
+
+        return (
+            cases.map(({id, title, completed, isEditing = false}) => (
+                    <TasksPage
+                        key={id}
+                        id={id}
+                        title={title}
+                        completed={completed}
+                        isEditing={isEditing}
+                        onCancel={() => onCaseCancel(id)}
+                        onChange={(newTitle) => onCaseChange(id, newTitle)}
+                        onCompletedChange={(newCompleted) => onCaseCompletedChange(id, newCompleted)}
+                        onEdit={() => onCaseEdit(id)}
+                        onSave={() => onCaseSave(id)}
+                        onRemove={() => onCaseRemove(id)}/>
+                )
+            )
+        )
+    }
+
+    return (
+        <>
+            <div className="panel">
+                <Search onSearch={onSearch}/>
+
+                <Button className="buttons"
+                        onClick={onCaseAdd}
+                        type="button"
+                >
+                    Add Case ➕
+                </Button>
+
+                <Sorting onSorting={onSorting}/>
+            </div>
+            <div>
+                {renderContent()}
+            </div>
+        </>
+    )
+}

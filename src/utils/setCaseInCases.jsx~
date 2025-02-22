@@ -1,0 +1,4 @@
+export const setCaseInCases = (cases, caseToSet) => {
+    return cases.map((с) =>
+        (с.id === caseToSet.id ? {...с, ...caseToSet} : с))
+};

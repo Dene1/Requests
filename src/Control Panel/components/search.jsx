@@ -22,7 +22,7 @@ export const Search = ({onSearch}) => {
                 className="search"
                 type="text"
                 value={value}
-                placeholder="Поиск..."
+                placeholder="Enter the task for searching ... 🔎"
                 onChange={onChange}
             />
         </form>

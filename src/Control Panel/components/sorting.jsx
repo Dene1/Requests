@@ -11,7 +11,7 @@ export const Sorting = ({onSorting}) => {
     }
 
     return (
-        <Button className="sorting">
+        <Button>
             <input
                 className="checkbox1"
                 id="sorting-button"

@@ -1,6 +1,4 @@
-export const setCaseInCases = (cases, casee) =>
-    cases.map((caseItem) => caseItem.id === casee.id ? {
-            ...caseItem,
-            ...casee
-        } : caseItem
-    )
+export const setCaseInCases = (cases, caseToSet) => {
+    return cases.map((c) =>
+        (c.id === caseToSet.id ? {...c, ...caseToSet} : c))
+};
