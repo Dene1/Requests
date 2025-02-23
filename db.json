@@ -1,0 +1,28 @@
+{
+  "posts": [
+    {
+      "title": "123123",
+      "completed": false,
+      "id": 1
+    },
+    {
+      "title": "йцуйцуй",
+      "completed": false,
+      "id": 2
+    },
+    {
+      "title": "q",
+      "completed": false,
+      "id": 3
+    },
+    {
+      "title": "qqqq",
+      "completed": false,
+      "id": 4
+    }
+  ],
+  "comments": [],
+  "profile": {
+    "name": "typicode"
+  }
+}

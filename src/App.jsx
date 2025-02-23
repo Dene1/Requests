@@ -1,18 +1,21 @@
 import "./App.css"
 import {useCallback, useEffect, useState} from "react";
-import {createCase, deleteCase, readCase, updateCase} from "./assets/index.jsx";
-import {removeCase, setCaseInCases} from "./utils/index.jsx"
-import {generateUniqueId} from "./constants/newCaseId.jsx";
 import {ControlPanel} from "./Control Panel/ControlPanel.jsx";
-import {Route, Routes, useLocation, useNavigate} from "react-router-dom";
-import {TasksPage} from "./components/Tasks Page/TasksPage.jsx";
-import {TaskPageDetails} from "./components/Task Page Detail/TaskPageDetails.jsx";
-import {NotFound} from "./components/Not Found/NotFound.jsx";
+import {Case} from "./components/Case/Case.jsx";
+import {createCase, deleteCase, readCase, updateCase} from "./assets/api.jsx";
+import {setCaseInCases} from "./utils/setCaseInCases.jsx";
+import {removeCase} from "./utils/removeCase.jsx";
+import {findCase} from "./utils/find-case.jsx";
+import {addCaseInCases} from "./utils/addCaseInCases.jsx";
+import {NEW_CASE_ID} from "./constants/newCaseId.jsx";
+import {Context} from "./context.jsx";
 
 export default function App() {
+
     const [cases, setCases] = useState([])
     const [searchPhrase, setSearchPhrase] = useState("")
     const [isAlphabetSorting, setIsAlphabetSorting] = useState(false)
+
     const [isLoading, setIsLoading] = useState(false)
     const [refreshCaseFlag, setRefreshCaseFlag] = useState(false)
 
@@ -21,145 +24,81 @@ export default function App() {
     }, [refreshCaseFlag, setRefreshCaseFlag])
 
     useEffect(() => {
-        setIsLoading(true)
         readCase(searchPhrase, isAlphabetSorting)
-            .then((loadedCases) => {
-                const reversedCases = [...loadedCases].reverse();
-                setCases(reversedCases);
-            })
+            .then((loadedCases) => setCases(loadedCases))
             .catch(error => {
-                console.error("Error loading cases:", error);
+                console.log(error)
             })
             .finally(() => setIsLoading(false))
+
     }, [refreshCase, searchPhrase, isAlphabetSorting])
 
-    console.log("searchPhrase:", searchPhrase);
+    const onCaseAdd = () => setCases(addCaseInCases(cases))
 
-    const onCaseAdd = () => {
-        const NEW_CASE_ID = generateUniqueId();
-        const newCase = {
-            id: NEW_CASE_ID,
-            title: "",
-            completed: false,
-            isEditing: true
-        };
-        setCases(prevCases => [newCase, ...prevCases]);
-    };
+    const onCaseSave = (caseId) => {
+        const {title, completed} = findCase(cases, caseId) || {}
 
-    const location = useLocation();
-    const navigate = useNavigate();
-
-    const onCaseCreate = (caseId, title, completed = false) => {
-        if (title === "") {
-            alert("Добавьте название задачи");
-            return;
-        }
-
-        createCase({title, completed})
-            .then((newCaseFromServer) => {
-                const newCase = {
-                    ...newCaseFromServer,
+        if (caseId === NEW_CASE_ID) {
+            createCase({title, completed}).then((casee) => {
+                let updatedCases = setCaseInCases(cases, {
+                    id: NEW_CASE_ID,
                     isEditing: false
-                };
-                setCases((prevCases) => {
-                    const newCases = prevCases.filter((c) => c.id !== caseId);
-                    return [newCase, ...newCases];
-                });
-
-                if (window.location.pathname === `/task/${caseId}`) {
-                    navigate(`/task/${newCase.id}`);
-                }
+                })
+                updatedCases = removeCase(updatedCases, NEW_CASE_ID)
+                updatedCases = addCaseInCases(updatedCases, casee)
+                setCases(updatedCases)
             })
-            .catch((error) => console.error("Error creating case:", error));
-    };
-
-    const onCaseUpdate = (caseId, title) => {
-        console.log("onCaseUpdate - caseId:", caseId, "title:", title);
-        updateCase({id: caseId, title})
-            .then(() => {
-                setCases((prevCases) =>
-                    prevCases.map((c) => (c.id === caseId ? {
-                        ...c,
-                        title,
-                        isEditing: false
-                    } : c))
-                );
+        } else {
+            updateCase({id: caseId, title}).then(() => {
+                setCases(setCaseInCases(cases, {id: caseId, isEditing: false}))
             })
-            .catch((error) => console.error("Error updating case:", error));
-    };
+        }
+    }
 
     const onCaseEdit = (id) => {
-        setCases(prevCases => {
-            return prevCases.map(c => {
-                if (c.id === Number(id)) {
-                    return {...c, isEditing: true};
-                }
-                return c;
-            });
-        });
-    };
+        setCases(setCaseInCases(cases, {id, isEditing: true}))
+    }
 
     const onCaseChange = (id, newTitle) => {
         setCases(setCaseInCases(cases, {id, title: newTitle}))
     }
 
     const onCaseCompletedChange = (id, newCompleted) => {
-        updateCase({id, completed: newCompleted})
-            .then(() => {
-                setCases(prevCases => {
-                    console.log("onCaseCompletedChange - prevCases:", prevCases);
-                    return setCaseInCases(prevCases, {id, completed: newCompleted});
-                });
-            })
-            .catch((error) => console.error("Error updating case completion:", error));
-    };
-
-    const onCaseRemove = (id) => {
-        if (window.confirm("Are you sure you want to delete this task?")) {
-            deleteCase(id).then(() => setCases(removeCase(cases, id)))
-            navigate("/")
-            alert("Task deleted successfully!")
-        }
+        updateCase({id, completed: newCompleted}).then(() => {
+            setCases(setCaseInCases(cases, {id, completed: newCompleted}))
+        })
     }
 
-    const onCaseCancel = (id) => {
-        setCases(setCaseInCases(cases, {id, isEditing: false}));
-        refreshCase()
-    };
+    const onCaseRemove = (id) => {
+        deleteCase(id).then(() => setCases(removeCase(cases, id)))
+    }
 
     return (
         <div className="App">
-            <h1>📋 Your tasks 📋</h1>
-            {location.pathname === "/" && (
+            <h1>Список Задач</h1>
+            <Context value={onCaseAdd}>
                 <ControlPanel
                     onSearch={setSearchPhrase}
                     onSorting={setIsAlphabetSorting}
-                    onCaseAdd={onCaseAdd}
                 />
-            )}
-            {isLoading ? (<div className="loader"> Loading tasks... </div>) : (
-                <Routes>
-                    <Route path="/"
-                           element={<TasksPage
-                               cases={cases}
-                               onCaseChange={onCaseChange}
-                               onCaseCreate={onCaseCreate}
-                               onCaseCancel={onCaseCancel}
-                               searchPhrase={searchPhrase}
-                           />}/>
-                    <Route path="task/:id" element={<TaskPageDetails
-                        cases={cases}
-                        onCaseChange={onCaseChange}
-                        onCaseCancel={onCaseCancel}
-                        onCaseEdit={onCaseEdit}
-                        onCaseUpdate={onCaseUpdate}
-                        onCaseRemove={onCaseRemove}
-                        onCaseCompletedChange={onCaseCompletedChange}
-                    />}/>
-                    <Route path="*" element={<NotFound/>}/>
-                    <Route path="/404" element={<NotFound/>}/>
-                </Routes>
-            )}
+            </Context>
+            {
+                isLoading ? (<div> Загрузка... </div>) : (
+                    <div className="cases_one">
+                        {cases.map(({id, title, completed, isEditing = false}) => (
+                                <Context key={id} value={{title, completed, isEditing}}>
+                                    <Case
+                                        onChange={(newTitle) => onCaseChange(id, newTitle)}
+                                        onCompletedChange={(newCompleted) =>
+                                            onCaseCompletedChange(id, newCompleted)}
+                                        onEdit={() => onCaseEdit(id)}
+                                        onSave={() => onCaseSave(id)}
+                                        onRemove={() => onCaseRemove(id)}/>
+                                </Context>
+                            )
+                        )}
+                    < /div>)
+            }
         < /div>
     )
 }

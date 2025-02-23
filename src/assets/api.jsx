@@ -1,8 +1,8 @@
 import {HTTP_METHODS} from "../constants/http-method.jsx"
 
 const fetchServer = (method, {id, ...payload} = {}) => {
-    console.log("fetchServer - method:", method, "payload:", payload);
-    let url = `http://localhost:3005/tasks`
+
+    let url = `http://localhost:3005/posts`
 
     let options = {
         method,
@@ -15,7 +15,7 @@ const fetchServer = (method, {id, ...payload} = {}) => {
         const {searchPhrase, isAlphabetSorting} = payload
         const sortingParams = isAlphabetSorting
             ? `_sort=title&__order=asc`
-            : ""
+            : "_sort=id&_order=desc"
         url += `?${sortingParams}&title_like=${searchPhrase}`
     } else {
         if (method !== HTTP_METHODS.POST) {
@@ -26,11 +26,8 @@ const fetchServer = (method, {id, ...payload} = {}) => {
             options.body = JSON.stringify(payload)
         }
     }
-    return fetch(url, options).then((jsonData) => {
-            console.log("fetchServer - fetch URL:", url, "options:", options);
-            return jsonData.json()
-        }
-    )
+
+    return fetch(url, options).then((jsonData) => jsonData.json())
 }
 
 export const createCase = (newCase) => fetchServer("POST", newCase)
@@ -41,11 +38,8 @@ export const readCase = (searchPhrase = "", isAlphabetSorting = false) =>
         isAlphabetSorting
     })
 
-export const updateCase = ({
-                               id,
-                               title,
-                               completed,
-                               ...updCase
-                           }) => fetchServer("PATCH", {id, title, completed, ...updCase})
+export const updateCase = (updCase) => fetchServer("PATCH", updCase)
 
 export const deleteCase = (CaseId) => fetchServer("DELETE", {id: CaseId})
+
+

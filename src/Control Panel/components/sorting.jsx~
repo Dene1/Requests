@@ -11,15 +11,13 @@ export const Sorting = ({onSorting}) => {
     }
 
     return (
-        <Button>
+        <Button className="sorting">
             <input
-                className="checkbox1"
                 id="sorting-button"
                 type="checkbox"
                 checked={isEnabled}
                 onChange={onChange}
             />
-
             <label htmlFor="sorting-button">A&darr;</label>
         </Button>
     )

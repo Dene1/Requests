@@ -1,5 +1,20 @@
 {
-  "tasks": [
-    
-  ]
+  "posts": {
+    "6": {
+      "title": "Дело 1",
+      "completed": false
+    },
+    "7": {
+      "title": "delo 4",
+      "completed": true
+    },
+    "8": {
+      "title": "delo 65",
+      "completed": true
+    },
+    "10": {
+      "title": "ааааа",
+      "completed": false
+    }
+  }
 }

@@ -1,39 +1,20 @@
 {
-  "tasks": [
-    {
-      "title": "й",
-      "completed": true,
-      "id": 1
+  "posts": {
+    "6": {
+      "title": "Delo 1",
+      "completed": false
     },
-    {
-      "title": "1",
-      "completed": false,
-      "id": 2
+    "7": {
+      "title": "delo 4",
+      "completed": true
     },
-    {
-      "title": "я",
-      "completed": false,
-      "id": 3
+    "8": {
+      "title": "delo 65",
+      "completed": true
     },
-    {
-      "title": "z",
-      "completed": false,
-      "id": 4
-    },
-    {
-      "title": "a",
-      "completed": false,
-      "id": 5
-    },
-    {
-      "title": "123",
-      "completed": false,
-      "id": 6
-    },
-    {
-      "title": "qweqwe",
-      "completed": true,
-      "id": 7
+    "10": {
+      "title": "ааааа",
+      "completed": false
     }
-  ]
+  }
 }
