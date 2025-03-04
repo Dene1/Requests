@@ -1,5 +1,0 @@
-import {addCaseInCases} from './addCaseInCases.jsx'
-import { removeCase} from './removeCase.jsx'
-import {setCaseInCases}  from './setCaseInCases.jsx'
-import {findCase} from './find-case.jsx'
-

@@ -1,5 +1,0 @@
-export const debounce = (func, delay) => {
-    return (...args) => {
-        setTimeout(func, delay, ...args);
-    }
-}

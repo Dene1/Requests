@@ -1,0 +1,7 @@
+export const NEW_CASE_ID = "NEW_CASE_ID"
+export const RESET = "RESET"
+export const SET_CASES = "SET_CASES"
+export const SET_LOADING = "SET_LOADING"
+export const SET_SEARCH_PHRASE = "SET_SEARCH_PHRASE"
+export const SET_ALPHABET_SORTING = "SET_ALPHABET_SORTING"
+export const SET_REFRESH_FLAG = "SET_REFRESH_FLAG"

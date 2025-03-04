@@ -1,6 +1,0 @@
-export const setCases = (cases, casee) =>
-    cases.map((caseItem) =>  caseItem.id === casee.id ? {
-            ...caseItem,
-            ...casee
-        } : caseItem
-    )
